@@ -111,6 +111,7 @@ public class CatCrossing extends Canvas implements Runnable {
 		}
 		List<Chicken> chickens = List.of(new Chicken(100,100,200,camera, cat, collectables));
 		for(Chicken chicken : chickens) {
+			interactables.add(chicken);
 			entities.add(chicken);
 		}
 	}
@@ -204,6 +205,7 @@ public class CatCrossing extends Canvas implements Runnable {
 		for(Entity entity : entities) {
 			  if(entity instanceof Tree tree) {
 				  tree.drawTop(g2d);
+				  tree.draw(g2d);
 			  }
 		}
 	}
