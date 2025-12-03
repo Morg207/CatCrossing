@@ -4,6 +4,7 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,17 +13,21 @@ import java.util.Random;
 import animation.Animation;  
 import animation.Animator;
 import camera.Camera;
+import dialogue.DialogueSystem;
+import interaction.Interactable;
+import math.EngineMath;
 import sound.Sound;
 import sprite.SpriteManager;
 import utils.Timer;
 
-public class Chicken extends Entity {  
+public class Chicken extends Entity implements Interactable {  
 	
 	private static final BufferedImage[][] CHICKEN_IMAGES = SpriteManager.splitSprites(SpriteManager.loadImage
 	("/Characters/Free Chicken Sprites.png"), 16, 16, 52, 52);
 	private static final BufferedImage[][] FLIPPED_CHICKEN_IMAGES = SpriteManager.flipHorizontal(CHICKEN_IMAGES, 2, 4);
+	private static final BufferedImage CHICKEN_IMAGE_ICON = SpriteManager.scaleImage(CHICKEN_IMAGES[0][0], 80, 80);
 	private final Camera camera;
-	private final Animator animator;
+	private Animator animator;
 	private final AIPatrol aIPatrol;
 	private final Timer eggTimer;
 	private double eggSpawnTime;
@@ -30,11 +35,30 @@ public class Chicken extends Entity {
 	private final Random random;
 	private final List<Collectable> collectables;
 	private final Sound layEggSound;
-
+	private final DialogueSystem dialogueSystem;
+	private final Cat cat;
+	private final Sound cluckSound;
+	private boolean keyPressed;    
+ 
 	public Chicken(double x, double y, double patrolLength, Camera camera, Cat cat, List<Collectable> collectables) {
 		super(x, y, 0, 0, new Dimension(0, 0));
 		this.camera = camera;
 		this.collectables = collectables;
+		this.cat = cat;
+		initAnimators();
+		aIPatrol = new AIPatrol(animator, cat, this, patrolLength, 5);
+		random = new Random();
+		eggTimer = new Timer();
+		eggSpawnTime = random.nextDouble() * 100;
+		this.type = EntityType.CHICKEN;
+		cluckSound = new Sound("/Sounds/chicken_cluck.wav");
+		layEggSound = new Sound("/Sounds/lay_egg.wav");
+		layEggSound.setVolume(0.5f);
+		dialogueSystem = new DialogueSystem(new String[] {"Cluck cluck cluck..."},
+		CHICKEN_IMAGE_ICON, cluckSound);
+	}
+	
+	private void initAnimators() {
 		animator = new Animator();
 		List<BufferedImage> idleImagesRight = new ArrayList<>(Arrays.asList(CHICKEN_IMAGES[0]));
 		List<BufferedImage> idleImagesLeft = new ArrayList<>(Arrays.asList(FLIPPED_CHICKEN_IMAGES[0]));
@@ -46,13 +70,6 @@ public class Chicken extends Entity {
 		animator.add("idle_right", new Animation(idleImagesRight.toArray(new BufferedImage[0]), 0.5, Animation.Type.LOOP));
 		animator.add("walking_right", new Animation(CHICKEN_IMAGES[1], 0.2, Animation.Type.LOOP));
 		animator.add("walking_left", new Animation(FLIPPED_CHICKEN_IMAGES[1], 0.2, Animation.Type.LOOP));
-		aIPatrol = new AIPatrol(animator, cat, this, patrolLength, 5);
-		random = new Random();
-		eggTimer = new Timer();
-		eggSpawnTime = random.nextDouble() * 100;
-		this.type = EntityType.CHICKEN;
-		layEggSound = new Sound("/Sounds/lay_egg.wav");
-		layEggSound.setVolume(0.5f);
 	}
 
 	@Override
@@ -89,7 +106,7 @@ public class Chicken extends Entity {
 	    g2d.setColor(Color.ORANGE);
 	    g2d.fillRoundRect((int)Math.round(x+2), (int)Math.round(y+2), barWidth, barHeight, 10, 10);
 	}
-
+ 
 	@Override
 	public void draw(Graphics2D g2d) {
 		
@@ -103,6 +120,41 @@ public class Chicken extends Entity {
 			drawEggMeter(g2d, (this.x-2-camera.getXOffset()), (this.y-10-camera.getYOffset()), startBarWidth, barWidth, barHeight);
 		}else {
 			drawEggMeter(g2d, (this.x+5-camera.getXOffset()), (this.y-10-camera.getYOffset()), startBarWidth, barWidth, barHeight);
+		}
+	} 
+
+	@Override
+	public void updateInteraction(double deltaTime) {
+		dialogueSystem.update();
+		double distanceFromPlayer = EngineMath.distance(this.x + xOffset + width / 2, this.y + yOffset + height / 2, 
+			   cat.getX() + cat.getXOffset() + cat.getWidth() / 2, cat.getY() + cat.getYOffset() + cat.getHeight() / 2);
+		if(distanceFromPlayer >= 100) {
+			dialogueSystem.reset();
+		}
+	}
+
+	@Override
+	public void drawInteraction(Graphics2D g2d) {
+		dialogueSystem.draw(g2d);
+	}
+
+	@Override
+	public void processKeyPressed(KeyEvent key) {
+		
+		if(key.getKeyCode() == KeyEvent.VK_E && velX == 0) 
+		{
+			if(!cluckSound.getIsRunning() && !keyPressed) {
+			  dialogueSystem.setShowNextLine(true);
+			  dialogueSystem.setShowDialogue(true);
+			  keyPressed = true;
+			}
+		}
+	}
+
+	@Override
+	public void processKeyReleased(KeyEvent key) {
+		if(key.getKeyCode() == KeyEvent.VK_E) {
+			keyPressed = false;
 		}
 	}
 }
