@@ -1,7 +1,9 @@
 package entity;
 
 import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -10,6 +12,7 @@ import camera.Camera;
 import catcrossing.CatCrossing;
 import entity.Cat.Direction;
 import entity.Cat.Item;
+import font.FontLoader;
 import sound.Sound;
 import sprite.SpriteManager;
 import utils.Collision;
@@ -24,11 +27,19 @@ public class Tree extends Entity {
 	private final Camera camera;
 	private final Cat cat;
 	private int health;
+	private int damage;
 	private boolean chopped;
 	private boolean tookDamage;
 	private final List<Collectable> collectables;
 	private final Random random;
-	private final Sound damageSound; 
+	private final Sound damageSound;
+	private final Font damageFont;
+	private double damageTextVelX;
+	private double damageTextVelY;
+	private double damageTextX;
+	private double damageTextY;
+	private boolean drawDamage;
+	private double bounceFactor;
 
 	public Tree(double x, double y, Camera camera, Cat cat, List<Collectable> collectables) {
 		super(x, y, 0, 50, new Dimension(50,
@@ -39,6 +50,9 @@ public class Tree extends Entity {
 		health = 100;
 		random = new Random();
 		damageSound = new Sound("/Sounds/tree_hit.wav");
+		damageFont = FontLoader.loadFont("/Fonts/pixel.ttf", Font.BOLD, 21);
+		damage = random.nextInt(20, 50);
+		bounceFactor = 1.0;
 	}
 
 	@Override
@@ -52,7 +66,34 @@ public class Tree extends Entity {
 			updateBoundingBoxInfo(10, 60, 30, 20);
 			boundingBox.setBounds((int)this.x+xOffset, (int)this.y+yOffset, width, height);
 		}
+		if(drawDamage) {
+		  bounceDamageText(deltaTime);
+		}
 	}
+	
+	private void bounceDamageText(double deltaTime) {
+		damageTextX += damageTextVelX * deltaTime;
+		damageTextY += damageTextVelY * deltaTime;
+		damageTextVelY += 45;
+		if(damageTextY > this.y+100) {
+			bounceFactor *= 0.8;
+			if(bounceFactor <= 0.1) {
+				damageTextVelX = 0;
+				drawDamage = false;
+			}
+			damageTextVelY = -damageTextVelY * bounceFactor;
+		}
+	} 
+	
+	private void setDamageInfo(double worldX, double worldY) {
+		drawDamage = true;
+		damage = random.nextInt(20, 50);
+		bounceFactor = 1.0;
+		damageTextVelX = random.nextDouble(-100, 100);
+		damageTextVelY = random.nextDouble(-300, -100);
+	    damageTextX = random.nextDouble(worldX, worldX+50);
+	    damageTextY = this.y+50;
+	} 
 	
 	private int[] tileInFrontOfPlayer() {
 		int col = (int)(cat.getX() + cat.getXOffset() + cat.getWidth() / 2) / CatCrossing.TILE_SIZE;
@@ -75,7 +116,8 @@ public class Tree extends Entity {
         int worldY = tileRow * CatCrossing.TILE_SIZE;
 		if(cat.itemInUse() == Item.AXE) {
 			if(!tookDamage && worldX == this.x+xOffset && worldY == this.y+yOffset) {
-				health -= 25;
+				setDamageInfo(worldX, worldY);
+				health -= damage;
 				damageSound.play();
 				if(health <= 0) {
 					double woodX = worldX - random.nextDouble() * 50 + random.nextDouble() * 50;
@@ -98,8 +140,8 @@ public class Tree extends Entity {
         } else {
             g2d.drawImage(STUMP, drawX, (int)(this.y + 50 - camera.getYOffset()), null);
         }
-    }
-
+    } 
+  
 	public void drawTop(Graphics2D g2d) {
 	    if(!chopped) {
 	    	g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
@@ -111,6 +153,10 @@ public class Tree extends Entity {
 	
 	@Override
 	public void draw(Graphics2D g2d) {
-		
+		if(drawDamage) {
+			g2d.setFont(damageFont);
+			g2d.setColor(new Color(245, 120, 120));
+			g2d.drawString(Integer.toString(damage), (int)(damageTextX-camera.getXOffset()), (int)(damageTextY-camera.getYOffset()));
+		}
 	}
 }
