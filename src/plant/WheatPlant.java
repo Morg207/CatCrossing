@@ -26,11 +26,10 @@ public class WheatPlant extends Plant {
 	private double soilDryTime;
 	private boolean watered;
 	private Cat cat;
-	private TileMap tileMap; 
+	private TileMap tileMap;  
 	
 	public WheatPlant(Vector2 position, Cat cat, TileMap tileMap, Camera camera) {
 		super(WHEAT_IMAGES, position, WHEAT_IMAGES.length-3, camera);
-		waterTime = 5;
 		this.cat = cat;
 		this.tileMap = tileMap;
 		soilDryTime = 10;
