@@ -8,10 +8,10 @@ import math.MathUtils;
 
 public class DayNightCycle {
 
-    public enum Phase {
+    private enum Phase {
         DAY, SUNSET, NIGHT, SUNRISE
-    } 
-
+    }    
+ 
     private Phase phase;
     private double phaseTimer;
     private double dayDuration;
@@ -30,15 +30,15 @@ public class DayNightCycle {
     
     public DayNightCycle() {
     	dayColour = new Color(255,255,255);
-    	sunsetColour = new Color(237,214,83);
+    	sunsetColour = new Color(237,214,83);  
     	nightColour = new Color(56,91,105);
     	sunriseColour = new Color(245,239,132);
     	sunsetDuration = 15;
     	dayDuration = 60;
     	nightDuration = 30;
     	transitionDuration = 10;
-    	phase = Phase.DAY;   
-    }  
+    	phase = Phase.DAY;    
+    }   
 
     public void update(double deltaTime) {
     	if(!atSunset) {
@@ -145,14 +145,14 @@ public class DayNightCycle {
                     return 0.6f;
                 } else {
                     double t = (time - 0.5) / 0.5;
-                    return (float) MathUtils.lerp(0.6, 0.3, t);
+                    return (float)MathUtils.lerp(0.6, 0.3, t);
                 }
             case NIGHT:
                 return 0.3f;
             case SUNRISE:
                 if (time < 0.5) {
                 	double t = time / 0.5;
-                    return (float) MathUtils.lerp(0.3, 0.6, t);
+                    return (float)MathUtils.lerp(0.3, 0.6, t);
                 } else {
                     return 0.6f;
                 }
@@ -169,14 +169,14 @@ public class DayNightCycle {
                     return 1.0f;
                 } else {
                     double t = (time - 0.5) / 0.5;
-                    return (float) MathUtils.lerp(1.0, 0.7, t);
+                    return (float)MathUtils.lerp(1.0, 0.7, t);
                 }
             case NIGHT:
                 return 0.7f;
             case SUNRISE:
                 if (time < 0.5) {
                 	double t = time / 0.5;
-                    return (float) MathUtils.lerp(0.7, 1.0, t);
+                    return (float)MathUtils.lerp(0.7, 1.0, t);
                 } else {
                     return 1.0f;
                 }
@@ -193,14 +193,14 @@ public class DayNightCycle {
                     return 1f;
                 } else {
                     double t = (time - 0.5) / 0.5;
-                    return (float) MathUtils.lerp(1.0, 0.6, t);
+                    return (float)MathUtils.lerp(1.0, 0.6, t);
                 }
             case NIGHT:
                 return 0.6f;
             case SUNRISE:
                 if (time < 0.5) {
                 	double t = time / 0.5;
-                    return (float) MathUtils.lerp(0.6, 1.0, t);
+                    return (float)MathUtils.lerp(0.6, 1.0, t);
                 } else {
                     return 1.0f;
                 }
