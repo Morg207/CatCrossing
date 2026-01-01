@@ -57,9 +57,7 @@ public class AIPatrol {
 				entity.position.y + entity.getYOffset() + entity.getHeight()/2,
 				cat.position.x + cat.getXOffset() + cat.getWidth()/2, cat.position.y + cat.getYOffset() + cat.getHeight()/2);
 		if(distanceFromPlayer > 100) {
-			if(entity.vel.x == 0) {
-				cat.setInteracting(false);
-			}
+			cat.setInteracting(false);
 		    entity.setVelX(20 * lastWalkDirection);
 		    if(!atEnd) {
 		    animationState = lastWalkDirection == 1
@@ -80,6 +78,10 @@ public class AIPatrol {
 	} 
 	
 	private void patrol(double deltaTime) {
+		if ((animationState == AnimationState.WALKING_LEFT && entity.vel.x == 0) ||
+			    (animationState == AnimationState.WALKING_RIGHT && entity.vel.x == 0)) {
+			    entity.setVelX(20 * lastWalkDirection);
+		}
 		entity.position.x += entity.vel.x * deltaTime;
 		if(animationState == AnimationState.WALKING_RIGHT) {
 			animator.play("walking_right");
