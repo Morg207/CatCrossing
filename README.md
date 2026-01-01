@@ -8,3 +8,15 @@ A 2D Tile Based Game And Game Engine Written In Java with Java Swing.
 <img width="1057" height="794" alt="Cat Crossing Screenshot 5" src="https://github.com/user-attachments/assets/41ecf178-1c8f-46f9-b22b-fe72537e02aa" />
 
 <img width="1053" height="729" alt="Cat Crossing Screenshot 6" src="https://github.com/user-attachments/assets/d260158f-d708-4d39-98cf-a378a4a7e97e" />
+
+Future Plans
+
+Fixed a bug with the AI logic.  
+
+I aim to fix sound in the future.  
+
+I may add a save system.  
+
+I plan to add more plant types and harvesting collectables.  
+
+
