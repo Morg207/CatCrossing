@@ -17,6 +17,13 @@ I aim to fix sound in the future.
 
 I may add a save system.  
 
-I plan to add more plant types and harvesting collectables.  
+I plan to add more plant types and harvesting collectables.
+
+How to setup the project
+
+If you're using eclipse, right click the res folder, go to properties, build path, 
+Source, then add the res folder to the build path. Apply and then apply and close.
+
+I'm not sure how you'd do it in another IDE.
 
 
