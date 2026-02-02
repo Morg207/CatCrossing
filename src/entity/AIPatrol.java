@@ -48,15 +48,15 @@ public class AIPatrol {
 			   entity.setVelX(-20);
 			}
 	} 
-	  
+	    
 	public void update(double deltaTime) {
 		
-		patrol(deltaTime);
+		patrol(deltaTime);  
 		
 		double distanceFromPlayer = MathUtils.distance(entity.position.x + entity.getXOffset() + entity.getWidth()/2,
 				entity.position.y + entity.getYOffset() + entity.getHeight()/2,
 				cat.position.x + cat.getXOffset() + cat.getWidth()/2, cat.position.y + cat.getYOffset() + cat.getHeight()/2);
-		if(distanceFromPlayer > 100) {
+		if(distanceFromPlayer > 100 && entity.getVelX() == 0) {
 			cat.setInteracting(false);
 		    entity.setVelX(20 * lastWalkDirection);
 		    if(!atEnd) {
